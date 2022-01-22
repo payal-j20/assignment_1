@@ -32,7 +32,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 /**
  *
- * @author shiv
+ * @author payal
  */
 @Controller
 public class Validate {
@@ -42,6 +42,16 @@ public class Validate {
         System.out.println("hi-----------------------"+qt);
         return "log";
     }*/
+    @RequestMapping("/")
+    public String abc(){
+        return "reg";
+    }
+    
+    @RequestMapping("/log")
+    public String abc2(){
+        
+        return "log";
+    }
     @RequestMapping("regvalidate")
     public ModelAndView chk(@RequestParam("email") String em,@RequestParam("userid") String ui,@RequestParam("password") String pas) throws ClassNotFoundException, SQLException{
         
@@ -65,6 +75,7 @@ public class Validate {
             db ob=new db();
             Connection con=ob.init();
             Statement stmt = con.createStatement();  
+            //CHECK IF USERID IS UNIQUE OR ALREADY EXIST
             ResultSet rs3 = stmt.executeQuery("select * from user1 where userid='"+ui+"'");
             if(rs3.next()){
                 mv.setViewName("reg");
@@ -103,7 +114,8 @@ public class Validate {
             
             db ob=new db();
             Connection con=ob.init();
-            Statement stmt = con.createStatement();  
+            Statement stmt = con.createStatement(); 
+            //CHECK WHETHER USER IS EXIST OR NOT
             ResultSet rs3 = stmt.executeQuery("select * from user1 where userid='"+ui+"' and password='"+pas+"'");
             if(rs3.next()){
                 System.out.println("ui"+rs3.getString("userid"));
@@ -122,14 +134,8 @@ public class Validate {
     }
     @RequestMapping(value="{userid}/order_confirm",method=POST)
     public ModelAndView confirm(@PathVariable("userid") String ui,@RequestParam("qty") String qty,@RequestParam("coupon") String coupon) throws ClassNotFoundException, SQLException, JsonProcessingException, InterruptedException{
-        //Orders ob=new Orders();
-        request_api ob=new request_api();
-        //ob.productvalidate(ui, qty, coupon);
-        
-        System.out.println("$$$$$"+qty);
-        System.out.println("$$$$$"+coupon);
-        System.out.println("$$$$$"+ui);
-            
+        //CALL API TO CHECK WHETHER QUANTITY IS AVAILABLE OR NOT
+        request_api ob=new request_api();    
         int qt=Integer.parseInt(qty);
         JSONObject ab=new JSONObject(ob.productvalidate(ui, qty, coupon));
         String sc=ab.get("Status Code").toString();
@@ -137,7 +143,7 @@ public class Validate {
         System.out.print("HttpStatus.OK:"+HttpStatus.OK.toString());
         if(sc.equals(HttpStatus.OK.toString())){
             int am=Integer.parseInt(ab.get("amount").toString());
-            
+            //RETURN AMOUNT TO BE PAID
             ModelAndView mv=new ModelAndView("payment");
             mv.setViewName("payment");
             mv.addObject("userid",ui);

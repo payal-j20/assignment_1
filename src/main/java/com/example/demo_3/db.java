@@ -11,20 +11,18 @@ import java.sql.SQLException;
 
 /**
  *
- * @author shiv
+ * @author payal
  */
 public class db {
     public Connection init() throws ClassNotFoundException, SQLException{
         
-        String dbDriver = "org.apache.derby.jdbc.ClientDriver1212";
-        String dbURL = "jdbc:derby://localhost:1527/12";
-        String dbName = "g12";
-        String dbUsername = "2gr";
-        String dbPassword = "121g";
-        
-        Class.forName(dbDriver);
-        //DriverManager.registerDriver(new org.postgresql.Driver());
+        String dbURL ="jdbc:postgresql://ec2-34-194-171-47.compute-1.amazonaws.com:5432/";
+        String dbName = "d80qshevosrskt";
+        String dbUsername = "nqboosghvprlse";
+        String dbPassword = "7f043a231c1d841becef331deae630bd04e4d60b0816473a7503354730b35ec8";
+        DriverManager.registerDriver(new org.postgresql.Driver());
         Connection con = DriverManager.getConnection(dbURL + dbName,dbUsername,dbPassword);
+            
         return con;
     }
    

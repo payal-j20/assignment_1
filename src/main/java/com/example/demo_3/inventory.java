@@ -12,9 +12,10 @@ import java.sql.Statement;
 
 /**
  *
- * @author shiv
+ * @author payal
  */
 public class inventory {
+    
     int ordered,price,available;
     public inventory() throws ClassNotFoundException, SQLException{
         db a=new db();

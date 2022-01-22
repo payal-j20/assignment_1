@@ -18,9 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.RequestDispatcher;
-import javax.websocket.server.PathParam;
-import javax.xml.ws.Response;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -40,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class request_api {
+    //LIST ALL PRODUCT DETAILS
     @RequestMapping(value="inventory",method=GET,produces = MediaType.APPLICATION_JSON_VALUE)
     public String inventory() throws ClassNotFoundException, SQLException{
         inventory ab=new inventory();
@@ -47,6 +45,7 @@ public class request_api {
         jsonObject.put("Status Code"+HttpStatus.OK,new JSONObject(ab) );
         return jsonObject.toString();
     }
+    //LIST ALL THE AVAILABLE COUPONS
     @RequestMapping(value="fetchCoupons",method=GET,produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public String couponlist() throws ClassNotFoundException, SQLException{
@@ -67,7 +66,7 @@ public class request_api {
     }
     
     
-    
+    //CHECK WHTHER PRODUCT IS AVAILABLE IN STOCK OR NOT
     @RequestMapping(value="{userid}/order",method=POST,produces = MediaType.APPLICATION_JSON_VALUE)
     public String productvalidate(@PathVariable("userid") String ui,@RequestParam("qty") String qty,@RequestParam("coupon") String coupon) throws ClassNotFoundException, SQLException, JsonProcessingException, InterruptedException{
         //Orders ob=new Orders();
@@ -97,9 +96,6 @@ public class request_api {
             coupon_list[i]=rs2.getString("coupon");
             i++;
         }
-        
-        System.out.println("coupon fetch finished");
-        
         if(tq>=Integer.parseInt(qty)){
             System.out.println("INSTOCK                -----");
             for(int j=0;j<coupon_list.length;j++){
@@ -149,9 +145,9 @@ public class request_api {
         }
        
     }
-    
+    //MAKE PAYMENT
     @RequestMapping(value="{userid}/pay",method=POST,produces = MediaType.APPLICATION_JSON_VALUE)
-    public String payment(@PathVariable("userid") String ui,@RequestParam("amount") String amount,@RequestParam("amount") String qty,@RequestParam("coupon") String coupon) throws SQLException, ClassNotFoundException{
+    public String payment(@PathVariable("userid") String ui,@RequestParam("amount") String amount,@RequestParam("qty") String qty,@RequestParam("coupon") String coupon) throws SQLException, ClassNotFoundException{
         int prev_oid=0,prev_tid=0,tq=0,price=0;
         int qt=Integer.parseInt(qty);
         int amt=Integer.parseInt(amount);
@@ -163,15 +159,25 @@ public class request_api {
         int ordered=0;
         while(rs1.next()){
             ordered=rs1.getInt("ordered");
-            
+            tq=rs1.getInt("available");
         }
-        
+        System.out.println("ordered : "+ordered);
         ResultSet rs3 = stmt.executeQuery("select * from order_details where  id=(select max(id) from order_details)");
         while(rs3.next()){
             prev_oid=rs3.getInt("order_id");
             prev_tid=rs3.getInt("transaction_id");
         } 
-        PreparedStatement st2 = con.prepareStatement("update stock set available="+(tq-qt)+",ordered="+(ordered+qt)+"where available="+tq+"");
+        PreparedStatement st2 = con.prepareStatement("update stock set available="+(tq-qt)+",ordered="+(ordered+qt)+"where available="+tq);
+        
+        System.out.println("tq : ----------------->"+tq);
+        System.out.println("qt : "+qt);
+        
+        System.out.println("available : "+(tq-qt));
+        System.out.println("ordered : "+(ordered+qt));
+        
+        
+        
+        
         st2.executeUpdate();
         PreparedStatement st = con.prepareStatement("insert into order_details(order_date,userid,order_id,quantity,amount,coupon,transaction_id,status) values(?,?,?,?,?,?,?,?)");
         LocalDate c_date = LocalDate.now();
@@ -216,6 +222,7 @@ public class request_api {
             return jsonObject.toString();
         }
     }
+    //LIST ALL ORDERS MADE BY USER
     @RequestMapping(value="{userid}/orders",method=GET,headers = "Accept=application/json")
     public String order_details(@PathVariable("userid") String ui) throws JsonProcessingException, SQLException, ClassNotFoundException, InterruptedException{
         Orders ob=new Orders();
@@ -225,6 +232,7 @@ public class request_api {
         return rt.toString();
         
     }
+    //CHECK STATUS OF ORDER
     @RequestMapping(value="{userid}/orders/{orderid}",method=GET,produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public String  order_status(@PathVariable("userid") String ui,@PathVariable("orderid") String oid) throws SQLException, ClassNotFoundException{
@@ -242,14 +250,5 @@ public class request_api {
         //jsonObject.put("0", rg);
         return jsonObject.toString();
     }
-    @RequestMapping(value="test2",method=GET,produces = MediaType.APPLICATION_JSON_VALUE)
-    public String order_status2() throws JsonProcessingException{
-        test2 ob=new test2();
-        //System.out.print("-------------------------"+ob.nm.values());
-        //ob.chk();
-        Map j=ob.chk();
-        //JSONObject jsonObject= new JSONObject(content );
-        String json = new ObjectMapper().writeValueAsString(j);
-        return json;
-    }
+    
 }
