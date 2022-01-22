@@ -1,7 +1,7 @@
 <%-- 
     Document   : dis
     Created on : Jan 18, 2022, 4:25:28 PM
-    Author     : shiv
+    Author     : payal
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -12,7 +12,7 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        
         <%= request.getAttribute("userid") %>
         
         <form action="<%= request.getAttribute("userid") %>/order_confirm" method="post" >
