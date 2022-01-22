@@ -16,10 +16,10 @@ import java.sql.SQLException;
 public class db {
     public Connection init() throws ClassNotFoundException, SQLException{
         
-        String dbURL ="jdbc:postgresql://ec2-34-194-171-47.compute-1.amazonaws.com:5432/";
-        String dbName = "d80qshevosrskt";
-        String dbUsername = "nqboosghvprlse";
-        String dbPassword = "7f043a231c1d841becef331deae630bd04e4d60b0816473a7503354730b35ec8";
+        String dbURL ="";
+        String dbName = "";
+        String dbUsername = "";
+        String dbPassword = "";
         DriverManager.registerDriver(new org.postgresql.Driver());
         Connection con = DriverManager.getConnection(dbURL + dbName,dbUsername,dbPassword);
             
